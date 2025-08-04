@@ -6,8 +6,8 @@ Standardisiertes Setup für Data Science Teams mit Docker/Kubernetes Support.
 
 ### 1. Repository klonen
 ```bash
-git clone https://github.com/christianlohr9/hackathon-infrastructure.git
-cd hackathon-infrastructure
+git clone https://github.com/christianlohr9/hackathon_setup.git
+cd hackathon_setup
 ```
 
 ### 2. Erste Einrichtung
