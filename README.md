@@ -1,6 +1,6 @@
 # 🚀 Hackathon Infrastructure Setup
 
-Senior Cloud Architect Setup für Data Science Teams mit Docker/Kubernetes Support.
+Standardisiertes Setup für Data Science Teams mit Docker/Kubernetes Support.
 
 ## 📥 Setup & Installation
 
