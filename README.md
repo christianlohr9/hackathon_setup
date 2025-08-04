@@ -1,128 +1,293 @@
 # 🚀 Hackathon Infrastructure Setup
 
-Standardisiertes Setup für Data Science Teams mit Docker/Kubernetes Support.
+**Schnelle, automatisierte Infrastruktur für Hackathons**
 
-## 📥 Setup & Installation
+## 🚀 Installation
 
-### 1. Repository klonen
 ```bash
+# 1. Repository klonen
 git clone https://github.com/christianlohr9/hackathon_setup.git
+
+# 2. In das Verzeichnis wechseln
 cd hackathon_setup
+
+# 3. Optional: Makedown installieren für erweiterte Commands
+pip install makedown
 ```
 
-### 2. Erste Einrichtung
+## 🎯 Schnellstart
+
+### Option 1: Direkter Start mit setup.sh
 ```bash
-# Prüfe Systemvoraussetzungen
-make detect-platform
-
-# Stelle sicher, dass Docker installiert ist
-# macOS: Docker Desktop von https://www.docker.com/products/docker-desktop
-# Ubuntu: Docker wird automatisch installiert
+./setup.sh ai         # AI/LLM Challenge
+./setup.sh datascience # Data Science/ML
+./setup.sh webapp      # Full-Stack Web App
+./setup.sh api         # API/Backend Only
+./setup.sh graph       # Graph Analytics
 ```
 
-## 🎯 Features
-
-- **Modulare Services**: Aktiviere nur was du brauchst
-- **Schnelle Einrichtung**: Ein Command für komplette Umgebung
-- **Multi-Deployment**: Docker Compose oder Kubernetes
-- **External Access**: Tailscale Integration für Remote-Zugriff
-- **Developer-Friendly**: Hot-Reload, Logs, Status-Monitoring
-
-## 📦 Verfügbare Services
-
-### Core Stack
-- **Backend**: FastAPI mit Python
-- **Frontend**: React/TypeScript mit Material-UI
-- **Database**: PostgreSQL + Redis
-- **Reverse Proxy**: Nginx mit automatischem Routing
-
-### ML/AI Services
-- **Open WebUI**: LLM Interface (Ollama Integration)
-- **Jupyter Lab**: Data Science Notebooks
-- **Neo4j**: Graph Database für RAG
-- **MinIO**: S3-kompatible Object Storage
-
-### Development Tools
-- **Hot Reload**: Automatische Code-Updates
-- **Monitoring**: Service Status Dashboard
-- **Git Sync**: Automatische Repository-Synchronisation
-
-## 🚀 Schnellstart
-
-### Option 1: Schnellstart mit Defaults
+### Option 2: Mit Makedown (empfohlen)
 ```bash
-make quick-start
+# Installation von Makedown (macOS)
+pip install makedown
+
+# Dann können Sie verwenden:
+makedown setup-ai      # oder kurz: m setup-ai
+makedown setup-webapp  # oder kurz: m setup-webapp
+makedown dev-ai        # Development Mode
+makedown status        # Service Status
 ```
 
-### Option 2: Individuelle Konfiguration
+## 📋 Voraussetzungen
+
+### Erforderlich
+- **Docker Desktop** (für macOS: [Download](https://www.docker.com/products/docker-desktop))
+- **Git**
+
+### Optional aber empfohlen
+- **Makedown** für erweiterte Commands:
+  ```bash
+  # Installation über pip
+  pip install makedown
+  
+  # Oder über Homebrew (falls verfügbar)
+  brew install makedown
+  
+  # Test der Installation
+  makedown --help
+  ```
+
+### Automatische Prüfung
 ```bash
-# 1. Umgebung initialisieren
-make init
+# Prüfung aller Voraussetzungen
+./setup.sh --check-deps
 
-# 2. Services interaktiv konfigurieren
-make interactive-config
-
-# 3. Services starten
-make start-services
-
-# 4. Status prüfen und Endpoints anzeigen
-make status
-make show-endpoints
+# Oder mit Makedown (falls installiert)
+makedown check-deps
 ```
 
-### 🎯 Für Team-Leads
+> **💡 Hinweis**: Alle Funktionen sind sowohl über `./setup.sh` als auch über `makedown` verfügbar. Makedown bietet zusätzliche Entwickler-Commands und eine bessere Übersicht. Wenn Sie Makedown nicht installieren möchten, können Sie alle grundlegenden Funktionen weiterhin über `./setup.sh` nutzen.
+
+### 🚀 Sofort loslegen (ohne Makedown Installation)
+Nach dem Klonen können Sie direkt starten:
 ```bash
-# 1. Repository Setup (einmalig vom Team-Lead)
-make init
-make interactive-config
-git add . && git commit -m "Configure hackathon environment"
-git push
+# Nach git clone und cd hackathon_setup
 
-# 2. Andere Teammitglieder
-git pull
-make start-services
+# Prerequisites prüfen
+./setup.sh check-deps
+
+# AI Preset starten
+./setup.sh ai
+
+# Status prüfen
+./setup.sh status
+
+# Services anzeigen
+./setup.sh endpoints
 ```
 
-## 🎛️ Challenge-basierte Konfiguration
+**Nach erfolgreichem Start:**
+- 🌐 **Frontend**: http://localhost (Übersichtsseite mit allen Services)
+- 🤖 **OpenWebUI**: http://localhost:8080 (LLM Chat Interface)
+- 📊 **Neo4j**: http://localhost:7474 (Graph Database, Login: neo4j/hackathon123)
+- ⚡ **API**: http://localhost:8000/docs (Interactive API Documentation)
 
-Das System erkennt automatisch deinen Challenge-Type und konfiguriert entsprechende Services:
+## 📋 Verfügbare Presets
 
-### AI/LLM Challenge
-- ✅ Open WebUI + Ollama
-- ✅ Neo4j für Graph RAG
-- ✅ FastAPI Backend
-- ✅ React Frontend
+### 🤖 AI/LLM Challenge
+**Perfekt für**: KI-Anwendungen, Chatbots, RAG-Systeme
+```bash
+./setup.sh ai
+```
+**Enthält**: OpenWebUI, Ollama, Neo4j, PostgreSQL, FastAPI
 
-### Data Science/ML
-- ✅ Jupyter Lab
-- ✅ PostgreSQL
-- ✅ PyTorch/Pandas/Scikit-learn
-- ✅ FastAPI für Model Serving
+### 📊 Data Science/ML
+**Perfekt für**: Machine Learning, Data Analysis, Visualisierung
+```bash
+./setup.sh datascience
+```
+**Enthält**: Jupyter Lab, PostgreSQL, MinIO, PyTorch, FastAPI
 
-### Graph Analytics
-- ✅ Neo4j Graph Database
-- ✅ Jupyter für Analysis
-- ✅ Backend für Graph APIs
+### 🌐 Full-Stack Web App
+**Perfekt für**: Web-Anwendungen, SaaS-Prototypen
+```bash
+./setup.sh webapp
+```
+**Enthält**: React Frontend, FastAPI Backend, PostgreSQL
 
-### Full-Stack Web App
-- ✅ Complete MERN-ähnlicher Stack
-- ✅ PostgreSQL Database
-- ✅ FastAPI Backend
-- ✅ React Frontend
+### ⚡ API/Backend Only
+**Perfekt für**: Microservices, REST APIs, Mobile Backends
+```bash
+./setup.sh api
+```
+**Enthält**: FastAPI, PostgreSQL, Redis, Swagger UI
+
+### 🕸️ Graph Analytics
+**Perfekt für**: Netzwerkanalyse, Knowledge Graphs, Empfehlungssysteme
+```bash
+./setup.sh graph
+```
+**Enthält**: Neo4j, Jupyter Lab, PostgreSQL, FastAPI
+
+## 🎛️ Services Individuell Konfigurieren
+
+### Schritt-für-Schritt: Services An-/Abschalten
+
+#### 1. Grundsetup erstellen
+```bash
+# Wählen Sie ein Basis-Preset (z.B. AI)
+makedown setup-ai
+# oder ohne Makedown: ./setup.sh ai
+```
+
+#### 2. Aktuelle Konfiguration anzeigen
+```bash
+makedown show-config
+```
+
+#### 3. Services nach Bedarf anpassen
+```bash
+# Für Data Science (Jupyter + MinIO, ohne OpenWebUI/Neo4j)
+makedown config-datascience
+
+# Oder einzeln:
+makedown disable-openwebui     # OpenWebUI ausschalten
+makedown disable-neo4j         # Neo4j ausschalten
+makedown enable-jupyter        # Jupyter einschalten
+makedown enable-minio          # MinIO einschalten
+```
+
+#### 4. Änderungen übernehmen
+```bash
+makedown restart
+```
+
+### 🧪 Dry Run Beispiele
+
+#### Beispiel 1: Nur Data Science mit XGBoost
+```bash
+# Nach git clone und cd hackathon_setup
+
+# 1. Setup (funktioniert bereits!)
+makedown setup-ai
+makedown show-config           # Zeigt: OpenWebUI✅, Neo4j✅, Jupyter❌, MinIO❌
+
+# 2. Für Data Science konfigurieren
+makedown config-datascience   # Automatisch: OpenWebUI❌, Neo4j❌, Jupyter✅, MinIO✅
+makedown show-config          # Überprüfen: Jupyter✅, MinIO✅
+
+# 3. Services mit neuer Konfiguration neu starten
+makedown restart              # Startet nur Jupyter + MinIO + Database
+
+# 4. Zugriff auf Services
+# Jupyter Lab: http://localhost:8888 (Token: hackathon)
+# MinIO: http://localhost:9001 (hackathon/hackathon123)
+```
+
+#### Beispiel 2: Minimales Backend für API-Entwicklung
+```bash
+# Nach git clone und cd hackathon_setup
+
+# 1. Setup
+makedown setup-api
+makedown show-config           # Zeigt aktuelle Services
+
+# 2. Auf minimal reduzieren
+makedown config-minimal        # Nur Backend + Database + Redis
+makedown show-config           # Überprüfen: Frontend❌, alle ML-Services❌
+
+# 3. Anwenden
+makedown restart               # Startet nur Backend + Database + Redis
+```
+
+#### Beispiel 3: Interaktive Konfiguration
+```bash
+# Nach git clone und cd hackathon_setup
+
+# Schritt-für-Schritt durch alle Services
+makedown interactive-config    # Fragt jeden Service einzeln ab
+```
+
+### 📋 Verfügbare Service-Commands
+
+#### Vorkonfigurierte Setups
+```bash
+makedown config-datascience    # Jupyter + MinIO (für ML/Data Science)
+makedown config-minimal        # Nur Backend + Database
+makedown config-fullstack      # Frontend + Backend + Database
+```
+
+#### Einzelne Services
+```bash
+makedown enable-openwebui      # OpenWebUI einschalten
+makedown disable-openwebui     # OpenWebUI ausschalten
+makedown enable-jupyter        # Jupyter Lab einschalten
+makedown disable-jupyter       # Jupyter Lab ausschalten
+makedown enable-neo4j          # Neo4j einschalten
+makedown disable-neo4j         # Neo4j ausschalten
+makedown enable-minio          # MinIO einschalten
+makedown disable-minio         # MinIO ausschalten
+makedown enable-frontend       # React Frontend einschalten
+makedown disable-frontend      # React Frontend ausschalten
+```
+
+#### Status und Kontrolle
+```bash
+makedown show-config           # Aktuelle Service-Konfiguration anzeigen
+makedown restart               # Services mit aktueller Konfiguration neu starten
+makedown status                # Status aller laufenden Services
+makedown stop                  # Alle Services stoppen
+```
+
+### 🔄 Typischer Workflow
+
+1. **Initial Setup**: `makedown setup-ai` (oder anderes Preset)
+2. **Konfiguration prüfen**: `makedown show-config`
+3. **Services anpassen**: `makedown config-datascience` (oder einzeln)
+4. **Konfiguration bestätigen**: `makedown show-config`
+5. **Services starten**: `makedown restart`
+6. **Status prüfen**: `makedown status`
+
+> **💡 Tipp**: Mit `makedown show-config` können Sie jederzeit sehen, welche Services aktiviert sind, bevor Sie `makedown restart` ausführen.
+
+## 🎛️ Erweiterte Optionen
+
+### Services einzeln steuern (ohne Makedown)
+```bash
+./setup.sh ai --start-only      # Nur starten, nicht konfigurieren
+./setup.sh ai --stop            # Services stoppen
+./setup.sh ai --restart         # Neu starten
+```
+
+### Status und Logs
+```bash
+./setup.sh status               # Alle Services anzeigen
+./setup.sh logs                 # Live-Logs anzeigen
+./setup.sh endpoints            # URLs aller Services
+```
+
+### Entwicklermodus
+```bash
+./setup.sh ai --dev             # Development Mode mit Hot Reload
+```
 
 ## 🌐 Service Endpoints
 
-Nach dem Start sind folgende Services verfügbar:
+Nach erfolgreichem Start sind folgende Services verfügbar:
 
-| Service | URL | Credentials |
-|---------|-----|-------------|
-| Frontend | http://localhost | - |
-| Backend API | http://localhost/api | - |
-| Open WebUI | http://localhost/webui | - |
-| Jupyter Lab | http://localhost/jupyter | Token: `hackathon` |
-| Neo4j Browser | http://localhost:7474 | neo4j/hackathon123 |
-| MinIO Console | http://localhost:9001 | hackathon/hackathon123 |
-| PostgreSQL | localhost:5432 | hackathon_user/[auto-generated] |
+| Service | URL | Credentials | Status |
+|---------|-----|-------------|--------|
+| **Frontend** | http://localhost | - | ✅ Läuft |
+| **Backend API** | http://localhost:8000 | - | ✅ Läuft |
+| **API Docs** | http://localhost:8000/docs | - | ✅ Verfügbar |
+| **OpenWebUI** | http://localhost:8080 | - | ✅ Läuft |
+| **Neo4j Browser** | http://localhost:7474 | neo4j/hackathon123 | ✅ Läuft |
+| **Jupyter Lab** | http://localhost:8888 | Token: `hackathon` | ⚙️ Wenn aktiviert |
+| **MinIO Console** | http://localhost:9001 | hackathon/hackathon123 | ⚙️ Wenn aktiviert |
+| **PostgreSQL** | localhost:5432 | hackathon_user/[siehe config.env] | ✅ Läuft |
+| **Redis** | localhost:6379 | - | ✅ Läuft |
+
+> **🎉 Erfolgreich gestartet!** Das Frontend ist unter http://localhost erreichbar und zeigt eine Übersicht aller Services.
 
 ## 🛠️ Development Workflow
 

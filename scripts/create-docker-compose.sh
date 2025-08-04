@@ -1,9 +1,23 @@
 #!/bin/bash
 # scripts/create-docker-compose.sh
 
-cat > docker/docker-compose.yml << 'EOF'
-version: '3.8'
+# Load configuration
+source config.env
 
+# Check if backend/frontend Dockerfiles exist
+BACKEND_EXISTS=false
+FRONTEND_EXISTS=false
+
+if [ -f "backend/Dockerfile" ]; then
+    BACKEND_EXISTS=true
+fi
+
+if [ -f "frontend/Dockerfile" ]; then
+    FRONTEND_EXISTS=true
+fi
+
+# Start generating docker-compose.yml
+cat > docker/docker-compose.yml << EOF
 networks:
   hackathon-network:
     driver: bridge
@@ -15,23 +29,11 @@ volumes:
   jupyter_data:
 
 services:
-  # Reverse Proxy (always enabled)
-  nginx:
-    image: nginx:alpine
-    container_name: hackathon-nginx
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ../config/nginx/nginx.conf:/etc/nginx/nginx.conf
-      - ../config/nginx/sites-enabled:/etc/nginx/sites-enabled
-    depends_on:
-      - backend
-      - frontend
-    networks:
-      - hackathon-network
-    restart: unless-stopped
+EOF
 
+# Add PostgreSQL (always enabled for database support)
+if [ "${ENABLE_DATABASE:-true}" = "true" ]; then
+cat >> docker/docker-compose.yml << EOF
   # PostgreSQL Database
   postgres:
     image: postgres:15-alpine
@@ -53,6 +55,11 @@ services:
         limits:
           memory: ${MEMORY_LIMIT_DB}
 
+EOF
+fi
+
+# Add Redis (always enabled for caching)
+cat >> docker/docker-compose.yml << EOF
   # Redis for caching/sessions
   redis:
     image: redis:7-alpine
@@ -63,7 +70,13 @@ services:
       - hackathon-network
     restart: unless-stopped
 
-  # Backend API (FastAPI)
+EOF
+
+# Add Backend (if Dockerfile exists or use placeholder image)
+if [ "${ENABLE_BACKEND:-true}" = "true" ]; then
+if [ "$BACKEND_EXISTS" = "true" ]; then
+cat >> docker/docker-compose.yml << EOF
+  # Backend API (FastAPI) - Custom Build
   backend:
     build:
       context: ../backend
@@ -89,7 +102,42 @@ services:
         limits:
           memory: ${MEMORY_LIMIT_BACKEND}
 
-  # Frontend (React/TypeScript)
+EOF
+else
+cat >> docker/docker-compose.yml << EOF
+  # Backend API (FastAPI) - Placeholder
+  backend:
+    image: tiangolo/uvicorn-gunicorn-fastapi:python3.11
+    container_name: hackathon-backend
+    environment:
+      DATABASE_URL: postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
+      REDIS_URL: redis://redis:6379
+      ENVIRONMENT: hackathon
+    volumes:
+      - ../data/uploads:/app/uploads
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - hackathon-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: ${MEMORY_LIMIT_BACKEND}
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+
+EOF
+fi
+fi
+
+# Add Frontend (if enabled and Dockerfile exists)
+if [ "${ENABLE_FRONTEND:-true}" = "true" ]; then
+if [ "$FRONTEND_EXISTS" = "true" ]; then
+cat >> docker/docker-compose.yml << EOF
+  # Frontend (React/TypeScript) - Custom Build
   frontend:
     build:
       context: ../frontend
@@ -112,6 +160,78 @@ services:
         limits:
           memory: ${MEMORY_LIMIT_FRONTEND}
 
+EOF
+else
+cat >> docker/docker-compose.yml << EOF
+  # Frontend (React) - Placeholder
+  frontend:
+    image: nginx:alpine
+    container_name: hackathon-frontend
+    ports:
+      - "3000:80"
+    volumes:
+      - ../config/nginx/default.html:/usr/share/nginx/html/index.html:ro
+    networks:
+      - hackathon-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: ${MEMORY_LIMIT_FRONTEND}
+
+EOF
+fi
+fi
+
+# Add Nginx reverse proxy (if enabled)
+if [ "${ENABLE_REVERSE_PROXY:-true}" = "true" ]; then
+
+cat >> docker/docker-compose.yml << EOF
+  # Reverse Proxy (Nginx)
+  nginx:
+    image: nginx:alpine
+    container_name: hackathon-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ../config/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ../config/nginx/sites-enabled:/etc/nginx/sites-enabled:ro
+      - ../config/nginx/default.html:/usr/share/nginx/html/index.html:ro
+EOF
+
+# Add dependencies based on enabled services
+DEPS_ADDED=false
+if [ "${ENABLE_BACKEND:-true}" = "true" ] || [ "${ENABLE_FRONTEND:-true}" = "true" ]; then
+cat >> docker/docker-compose.yml << EOF
+    depends_on:
+EOF
+    DEPS_ADDED=true
+fi
+
+if [ "${ENABLE_BACKEND:-true}" = "true" ]; then
+cat >> docker/docker-compose.yml << EOF
+      - backend
+EOF
+fi
+
+if [ "${ENABLE_FRONTEND:-true}" = "true" ]; then
+cat >> docker/docker-compose.yml << EOF
+      - frontend
+EOF
+fi
+
+cat >> docker/docker-compose.yml << EOF
+    networks:
+      - hackathon-network
+    restart: unless-stopped
+
+EOF
+fi
+
+# Add OpenWebUI (if enabled)
+if [ "${ENABLE_OPENWEBUI:-false}" = "true" ]; then
+cat >> docker/docker-compose.yml << EOF
   # Open WebUI for LLM interactions
   open-webui:
     image: ghcr.io/open-webui/open-webui:main
@@ -139,6 +259,12 @@ services:
       - hackathon-network
     restart: unless-stopped
 
+EOF
+fi
+
+# Add Neo4j (if enabled)
+if [ "${ENABLE_NEO4J:-false}" = "true" ]; then
+cat >> docker/docker-compose.yml << EOF
   # Neo4j for Graph RAG
   neo4j:
     image: neo4j:5-community
@@ -156,6 +282,12 @@ services:
       - hackathon-network
     restart: unless-stopped
 
+EOF
+fi
+
+# Add Jupyter Lab (if enabled)
+if [ "${ENABLE_JUPYTER:-false}" = "true" ]; then
+cat >> docker/docker-compose.yml << EOF
   # Jupyter Lab for data exploration
   jupyterlab:
     image: jupyter/datascience-notebook:latest
@@ -172,6 +304,12 @@ services:
       - hackathon-network
     restart: unless-stopped
 
+EOF
+fi
+
+# Add MinIO (if enabled)
+if [ "${ENABLE_MINIO:-false}" = "true" ]; then
+cat >> docker/docker-compose.yml << EOF
   # MinIO for S3-compatible object storage
   minio:
     image: minio/minio:latest
@@ -188,6 +326,8 @@ services:
     networks:
       - hackathon-network
     restart: unless-stopped
+
 EOF
+fi
 
 echo "✅ Docker Compose configuration created"
