@@ -24,6 +24,8 @@ pip install makedown
 ./setup.sh webapp      # Full-Stack Web App
 ./setup.sh api         # API/Backend Only
 ./setup.sh graph       # Graph Analytics
+./setup.sh mlops       # MLOps Stack (MLflow + Jupyter)
+./setup.sh demo        # Complete Demo Stack (All-in-One)
 ```
 
 ### Option 2: Mit Makedown (empfohlen)
@@ -34,6 +36,8 @@ pip install makedown
 # Dann können Sie verwenden:
 makedown setup-ai      # oder kurz: m setup-ai
 makedown setup-webapp  # oder kurz: m setup-webapp
+makedown setup-mlops   # oder kurz: m setup-mlops
+makedown setup-demo    # oder kurz: m setup-demo
 makedown dev-ai        # Development Mode
 makedown status        # Service Status
 ```
@@ -128,6 +132,20 @@ Nach dem Klonen können Sie direkt starten:
 ./setup.sh graph
 ```
 **Enthält**: Neo4j, Jupyter Lab, PostgreSQL, FastAPI
+
+### 🧪 MLOps Stack
+**Perfekt für**: ML Experiment Tracking, Model Management
+```bash
+./setup.sh mlops
+```
+**Enthält**: MLflow, Jupyter Lab, PostgreSQL, FastAPI, Redis
+
+### 🎬 Complete Demo Stack
+**Perfekt für**: Präsentationen, Live-Demos, Vollständige Showcases
+```bash
+./setup.sh demo
+```
+**Enthält**: MLflow, Jupyter Lab, Streamlit, PostgreSQL, FastAPI, Redis
 
 ## 🎛️ Services Individuell Konfigurieren
 
@@ -284,6 +302,8 @@ Nach erfolgreichem Start sind folgende Services verfügbar:
 | **Neo4j Browser** | http://localhost:7474 | neo4j/hackathon123 | ✅ Läuft |
 | **Jupyter Lab** | http://localhost:8888 | Token: `hackathon` | ⚙️ Wenn aktiviert |
 | **MinIO Console** | http://localhost:9001 | hackathon/hackathon123 | ⚙️ Wenn aktiviert |
+| **MLflow UI** | http://localhost:5000 | - | ⚙️ Wenn aktiviert |
+| **Streamlit Demo** | http://localhost:8501 | - | ⚙️ Wenn aktiviert |
 | **PostgreSQL** | localhost:5432 | hackathon_user/[siehe config.env] | ✅ Läuft |
 | **Redis** | localhost:6379 | - | ✅ Läuft |
 

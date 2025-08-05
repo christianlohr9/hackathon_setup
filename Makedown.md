@@ -32,6 +32,18 @@ This project provides automated infrastructure setup for hackathons with multipl
 ./setup.sh graph
 ```
 
+## [setup-mlops]() Setup MLOps Stack with MLflow + Jupyter + FastAPI
+
+```bash
+./setup.sh mlops
+```
+
+## [setup-demo]() Setup Complete Demo Stack (MLflow + Jupyter + Streamlit + API)
+
+```bash
+./setup.sh demo
+```
+
 ## [dev-ai]() Start AI preset in development mode with hot reload
 
 ```bash
@@ -48,6 +60,18 @@ This project provides automated infrastructure setup for hackathons with multipl
 
 ```bash
 ./setup.sh webapp --dev
+```
+
+## [dev-mlops]() Start MLOps preset in development mode
+
+```bash
+./setup.sh mlops --dev
+```
+
+## [dev-demo]() Start Demo Stack in development mode
+
+```bash
+./setup.sh demo --dev
 ```
 
 ## [status]() Show status of all running services
@@ -84,6 +108,18 @@ This project provides automated infrastructure setup for hackathons with multipl
 
 ```bash
 ./setup.sh webapp --restart
+```
+
+## [restart-mlops]() Restart MLOps preset services
+
+```bash
+./setup.sh mlops --restart
+```
+
+## [restart-demo]() Restart Demo Stack services
+
+```bash
+./setup.sh demo --restart
 ```
 
 ## [clean]() Clean all containers and data (WARNING: destructive)
@@ -273,6 +309,34 @@ sed -i '' 's/ENABLE_FRONTEND=true/ENABLE_FRONTEND=false/' config.env
 echo "✅ Frontend disabled. Run 'm restart' to apply changes."
 ```
 
+## [enable-mlflow]() Enable MLflow service
+
+```bash
+sed -i '' 's/ENABLE_MLFLOW=false/ENABLE_MLFLOW=true/' config.env
+echo "✅ MLflow enabled. Run 'm restart' to apply changes."
+```
+
+## [disable-mlflow]() Disable MLflow service
+
+```bash
+sed -i '' 's/ENABLE_MLFLOW=true/ENABLE_MLFLOW=false/' config.env
+echo "✅ MLflow disabled. Run 'm restart' to apply changes."
+```
+
+## [enable-streamlit]() Enable Streamlit demo app
+
+```bash
+sed -i '' 's/ENABLE_STREAMLIT=false/ENABLE_STREAMLIT=true/' config.env
+echo "✅ Streamlit enabled. Run 'm restart' to apply changes."
+```
+
+## [disable-streamlit]() Disable Streamlit demo app
+
+```bash
+sed -i '' 's/ENABLE_STREAMLIT=true/ENABLE_STREAMLIT=false/' config.env
+echo "✅ Streamlit disabled. Run 'm restart' to apply changes."
+```
+
 ## [show-config]() Show current service configuration
 
 ```bash
@@ -403,12 +467,16 @@ Available Presets:
   webapp     - Full-Stack Web App (React + FastAPI + DB)
   api        - API/Backend Only (FastAPI + Database)
   graph      - Graph Analytics (Neo4j + Jupyter)
+  mlops      - MLOps Stack (MLflow + Jupyter + FastAPI)
+  demo       - Complete Demo Stack (MLflow + Jupyter + Streamlit + API)
 
 Setup Commands:
   m setup-ai              # Setup AI preset
   m dev-ai                # Start AI preset in dev mode
   m setup-datascience     # Setup Data Science preset
   m setup-webapp          # Setup Web App preset
+  m setup-mlops           # Setup MLOps Stack
+  m setup-demo            # Setup Complete Demo Stack
 
 Service Configuration:
   m show-config           # Show current services
@@ -426,6 +494,10 @@ Individual Services:
   m disable-neo4j         # Disable Neo4j
   m enable-minio          # Enable MinIO
   m disable-minio         # Disable MinIO
+  m enable-mlflow         # Enable MLflow
+  m disable-mlflow        # Disable MLflow
+  m enable-streamlit      # Enable Streamlit Demo
+  m disable-streamlit     # Disable Streamlit Demo
 
 Management Commands:
   m status                # Show service status

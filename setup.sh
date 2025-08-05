@@ -29,6 +29,8 @@ show_usage() {
     echo -e "  ${GREEN}webapp${RESET}      - Full-Stack Web App (React + FastAPI + DB)"
     echo -e "  ${GREEN}api${RESET}         - API/Backend Only (FastAPI + Database)"
     echo -e "  ${GREEN}graph${RESET}       - Graph Analytics (Neo4j + Jupyter)"
+    echo -e "  ${GREEN}mlops${RESET}       - MLOps Stack (MLflow, Jupyter, FastAPI + DB)"
+    echo -e "  ${GREEN}demo${RESET}        - Complete Demo Stack (MLflow, Jupyter, Streamlit + API)"
     echo -e "  ${GREEN}custom${RESET}      - Use existing config.env"
     echo ""
     echo -e "${YELLOW}Management Commands:${RESET}"
@@ -244,6 +246,59 @@ MEMORY_LIMIT_FRONTEND=512m
 MEMORY_LIMIT_DB=2g
 EOF
             ;;
+        "mlops")
+            cat >> "$CONFIG_FILE" << EOF
+
+# Core Services
+ENABLE_DATABASE=true
+ENABLE_BACKEND=true
+ENABLE_FRONTEND=false
+ENABLE_REVERSE_PROXY=true
+
+# ML/AI Services
+ENABLE_OPENWEBUI=false
+ENABLE_JUPYTER=true
+ENABLE_NEO4J=false
+ENABLE_MLFLOW=true
+
+# Additional Services
+ENABLE_MINIO=false
+ENABLE_MONITORING=false
+ENABLE_REDIS=true
+
+# Resource Limits
+MEMORY_LIMIT_BACKEND=1g
+MEMORY_LIMIT_FRONTEND=256m
+MEMORY_LIMIT_DB=2g
+EOF
+            ;;
+        "demo")
+            cat >> "$CONFIG_FILE" << EOF
+
+# Core Services
+ENABLE_DATABASE=true
+ENABLE_BACKEND=true
+ENABLE_FRONTEND=false
+ENABLE_REVERSE_PROXY=true
+
+# ML/AI Services
+ENABLE_OPENWEBUI=false
+ENABLE_JUPYTER=true
+ENABLE_NEO4J=false
+ENABLE_MLFLOW=true
+ENABLE_STREAMLIT=true
+
+# Additional Services
+ENABLE_MINIO=false
+ENABLE_MONITORING=false
+ENABLE_REDIS=true
+
+# Resource Limits
+MEMORY_LIMIT_BACKEND=1g
+MEMORY_LIMIT_FRONTEND=256m
+MEMORY_LIMIT_DB=2g
+EOF
+            ;;
         *)
             echo -e "${RED}❌ Unknown preset: $preset${RESET}"
             exit 1
@@ -398,7 +453,7 @@ main() {
     local option=${2:-}
     
     case $command in
-        "ai"|"datascience"|"webapp"|"api"|"graph")
+        "ai"|"datascience"|"webapp"|"api"|"graph"|"mlops"|"demo")
             case $option in
                 "--stop")
                     load_config

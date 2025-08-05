@@ -27,6 +27,7 @@ volumes:
   neo4j_data:
   openwebui_data:
   jupyter_data:
+  mlflow_data:
 
 services:
 EOF
@@ -326,6 +327,62 @@ cat >> docker/docker-compose.yml << EOF
     networks:
       - hackathon-network
     restart: unless-stopped
+
+EOF
+fi
+
+# Add MLflow (if enabled)
+if [ "${ENABLE_MLFLOW:-false}" = "true" ]; then
+cat >> docker/docker-compose.yml << EOF
+  # MLflow for ML experiment tracking
+  mlflow:
+    image: python:3.11-slim
+    container_name: hackathon-mlflow
+    command: sh -c "pip install mlflow psycopg2-binary && mlflow server --host 0.0.0.0 --port 5000 --backend-store-uri postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME} --default-artifact-root /mlflow/artifacts"
+    volumes:
+      - mlflow_data:/mlflow/artifacts
+      - ../data/mlflow:/mlflow/artifacts
+    ports:
+      - "5000:5000"
+    depends_on:
+      - postgres
+    networks:
+      - hackathon-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+EOF
+fi
+
+# Add Streamlit (if enabled)
+if [ "${ENABLE_STREAMLIT:-false}" = "true" ]; then
+cat >> docker/docker-compose.yml << EOF
+  # Streamlit for quick demo apps
+  streamlit:
+    image: python:3.11-slim
+    container_name: hackathon-streamlit
+    working_dir: /app
+    command: sh -c "pip install streamlit pandas numpy matplotlib seaborn plotly requests && streamlit run app.py --server.port 8501 --server.address 0.0.0.0"
+    volumes:
+      - ../streamlit:/app
+      - ../data:/app/data
+    ports:
+      - "8501:8501"
+    environment:
+      BACKEND_URL: http://backend:8000
+      MLFLOW_TRACKING_URI: http://mlflow:5000
+    networks:
+      - hackathon-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/_stcore/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
 EOF
 fi
