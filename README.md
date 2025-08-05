@@ -302,10 +302,12 @@ Nach erfolgreichem Start sind folgende Services verfügbar:
 | **Neo4j Browser** | http://localhost:7474 | neo4j/hackathon123 | ✅ Läuft |
 | **Jupyter Lab** | http://localhost:8888 | Token: `hackathon` | ⚙️ Wenn aktiviert |
 | **MinIO Console** | http://localhost:9001 | hackathon/hackathon123 | ⚙️ Wenn aktiviert |
-| **MLflow UI** | http://localhost:5000 | - | ⚙️ Wenn aktiviert |
+| **MLflow UI** | http://localhost:5000 | - | ⚙️ Wenn aktiviert* |
 | **Streamlit Demo** | http://localhost:8501 | - | ⚙️ Wenn aktiviert |
 | **PostgreSQL** | localhost:5432 | hackathon_user/[siehe config.env] | ✅ Läuft |
 | **Redis** | localhost:6379 | - | ✅ Läuft |
+
+*) **MLflow Port-Hinweis**: Bei macOS AirPlay-Konflikten läuft MLflow auf Port 5001 statt 5000. Siehe [Troubleshooting](#-troubleshooting).
 
 > **🎉 Erfolgreich gestartet!** Das Frontend ist unter http://localhost erreichbar und zeigt eine Übersicht aller Services.
 
@@ -419,6 +421,42 @@ make start-services
 sudo netstat -tulpn | grep :8000
 
 # Modify ports in docker-compose.yml
+```
+
+**MLflow Port 5000 Konflikt (macOS AirPlay):**
+
+⚠️ **Häufiges Problem auf macOS**: Port 5000 wird standardmäßig von AirPlay Receiver belegt.
+
+```bash
+# Schnelle Lösung: Port prüfen
+lsof -i :5000
+
+# Option 1: AirPlay Receiver deaktivieren (empfohlen)
+# Systemeinstellungen → Freigaben → AirPlay Receiver → Deaktivieren
+
+# Option 2: MLflow auf anderen Port umleiten (5001)
+# Vor dem Setup ausführen:
+sed -i '' 's/5000:5000/5001:5000/g' scripts/create-docker-compose.sh
+```
+
+**Container-Wechsel zwischen Presets:**
+
+Beim Wechsel zwischen verschiedenen Presets (z.B. `ai` → `mlops`) entstehen Container-Konflikte:
+
+```bash
+# Problem: "Found orphan containers" oder "Port already in use"
+
+# Lösung 1: Eleganter Stop vor Wechsel
+m stop                    # Alle Container stoppen
+m setup-mlops            # Neues Preset starten
+
+# Lösung 2: Bei hartnäckigen Problemen - Vollständiges Cleanup
+m clean                  # ⚠️ Löscht alle Daten und Container!
+m setup-mlops            # Neues Preset starten
+
+# Lösung 3: Orphan Container entfernen
+docker compose down --remove-orphans
+m setup-mlops
 ```
 
 ## 🚀 Advanced Features
